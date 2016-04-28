@@ -1,0 +1,112 @@
+                      | # Execution begins at address 0
+  0x000:              |         .pos 0
+  0x000: 308400030000 | init:   irmovl Stack,%esp     # Set up stack pointer
+  0x006: 308500030000 |         irmovl Stack,%ebp     # Set up base pointer
+  0x00c: 7030000000   |         jmp Main              # Execute main program
+                      | 
+                      | # Array of 7 elements
+  0x014:              |         .align 4
+  0x014: dddd0000     | array:  .long 0xdddd          # These values should get sorted
+  0x018: eeee0000     |         .long 0xeeee
+  0x01c: bbbb0000     |         .long 0xbbbb
+  0x020: aaaa0000     |         .long 0xaaaa
+  0x024: ffff0000     |         .long 0xffff
+  0x028: cccc0000     |         .long 0xcccc
+  0x02c: 01010000     |         .long 0x0101          # This value should not change
+                      | 
+  0x030: 308006000000 | Main:   irmovl $6,%eax
+  0x036: a008         |         pushl %eax            # push array size 
+  0x038: 308214000000 |         irmovl array,%edx
+  0x03e: a028         |         pushl %edx            # push array address
+  0x040: 8046000000   |         call Bubble           # Bubble(array,6)
+  0x045: 10           |         halt
+                      | 
+                      | # void Bubble(int *data, int count)
+  0x046:              | Bubble:
+                      |     # your handtranslated code goes here
+  0x046: a058         | 		pushl	%ebp
+  0x048: 2045         | 		rrmovl	%esp, %ebp
+  0x04a: 308610000000 | 		irmovl	$16, %esi
+  0x050: 6164         | 		subl	%esi, %esp
+  0x052: 50050c000000 | 		mrmovl	12(%ebp), %eax
+  0x058: 308601000000 | 		irmovl	$1, %esi
+  0x05e: 6160         | 		subl	%esi, %eax
+  0x060: 4005f8ffffff | 		rmmovl	%eax, -8(%ebp)
+  0x066: 7072010000   | 		jmp	L9
+  0x06b:              | 	L13:
+  0x06b: 308600000000 | 		irmovl	$0, %esi
+  0x071: 4065f4ffffff | 		rmmovl	%esi, -12(%ebp)
+  0x077: 704b010000   | 		jmp	L10
+  0x07c:              | 	L12:
+  0x07c: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax	
+  0x082: 308601000000 | 		irmovl 	$1, %esi
+  0x088: 6060         | 		addl	%esi, %eax
+  0x08a: 6000         | 		addl 	%eax, %eax
+  0x08c: 6000         | 		addl	%eax, %eax		
+  0x08e: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x094: 6070         | 		addl	%edi, %eax
+  0x096: 502000000000 | 		mrmovl	(%eax), %edx
+  0x09c: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax
+  0x0a2: 6000         | 		addl 	%eax, %eax
+  0x0a4: 6000         | 		addl	%eax, %eax
+  0x0a6: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x0ac: 6070         | 		addl	%edi, %eax
+  0x0ae: 500000000000 | 		mrmovl	(%eax), %eax
+  0x0b4: 6102         | 		subl	%eax, %edx
+  0x0b6: 7537010000   | 		jge	L11
+  0x0bb: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax
+  0x0c1: 308601000000 | 		irmovl 	$1, %esi
+  0x0c7: 6060         | 		addl	%esi, %eax
+  0x0c9: 6000         | 		addl 	%eax, %eax
+  0x0cb: 6000         | 		addl	%eax, %eax		
+  0x0cd: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x0d3: 6070         | 		addl	%edi, %eax
+  0x0d5: 500000000000 | 		mrmovl	(%eax), %eax
+  0x0db: 4005fcffffff | 		rmmovl	%eax, -4(%ebp)
+  0x0e1: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax
+  0x0e7: 308601000000 | 		irmovl 	$1, %esi
+  0x0ed: 6060         | 		addl	%esi, %eax
+  0x0ef: 6000         | 		addl 	%eax, %eax
+  0x0f1: 6000         | 		addl	%eax, %eax		
+  0x0f3: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x0f9: 6070         | 		addl	%edi, %eax
+  0x0fb: 5025f4ffffff | 		mrmovl	-12(%ebp), %edx
+  0x101: 6022         | 		addl	%edx, %edx
+  0x103: 6022         | 		addl	%edx, %edx
+  0x105: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x10b: 6072         | 		addl	%edi, %edx
+  0x10d: 502200000000 | 		mrmovl	(%edx), %edx
+  0x113: 402000000000 | 		rmmovl	%edx, (%eax)
+  0x119: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax
+  0x11f: 6000         | 		addl 	%eax, %eax
+  0x121: 6000         | 		addl	%eax, %eax				
+  0x123: 507508000000 | 		mrmovl	8(%ebp), %edi
+  0x129: 6070         | 		addl	%edi, %eax
+  0x12b: 5025fcffffff | 		mrmovl	-4(%ebp), %edx
+  0x131: 402000000000 | 		rmmovl	%edx, (%eax)
+  0x137:              | 	L11:
+  0x137: 308601000000 | 		irmovl	$1, %esi
+  0x13d: 5075f4ffffff | 		mrmovl	-12(%ebp), %edi
+  0x143: 6067         | 		addl	%esi, %edi
+  0x145: 4075f4ffffff | 		rmmovl	%edi, -12(%ebp)
+  0x14b:              | 	L10:
+  0x14b: 5005f4ffffff | 		mrmovl	-12(%ebp), %eax
+  0x151: 5075f8ffffff | 		mrmovl	-8(%ebp), %edi
+  0x157: 6170         | 		subl	%edi, %eax
+  0x159: 727c000000   | 		jl	L12
+  0x15e: 308601000000 | 		irmovl	$1, %esi
+  0x164: 5075f8ffffff | 		mrmovl	-8(%ebp), %edi				
+  0x16a: 6167         | 		subl	%esi, %edi
+  0x16c: 4075f8ffffff | 		rmmovl	%edi, -8(%ebp)
+  0x172:              | 	L9:
+  0x172: 308600000000 | 		irmovl	$0, %esi
+  0x178: 5075f8ffffff | 		mrmovl	-8(%ebp), %edi
+                      | 
+  0x17e: 6167         | 		subl	%esi, %edi
+                      | 
+  0x180: 766b000000   | 		jg	L13
+  0x185: d0           | 		leave
+  0x186: 90           | 		ret
+                      | 		
+  0x300:              | 		.pos 0x300
+  0x300:              | Stack:                        # Stack goes here, grows down

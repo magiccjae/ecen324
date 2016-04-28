@@ -1,0 +1,64 @@
+# Jae Lee
+# jhl48
+
+.pos0
+	irmovl Stack,%esp
+	rrmovl %esp,%ebp
+	irmovl $3, %edx
+	pushl %edx
+	irmovl dest, %edx
+	pushl %edx
+	irmovl src,%edx
+	pushl %edx
+	call copy_block
+	halt
+	
+
+.align 4
+# Source block
+src:
+	.long 0x00a
+	.long 0x0b0
+	.long 0xc00
+
+# Destination block
+dest:
+	.long 0x111
+	.long 0x222
+	.long 0x333
+	
+copy_block:
+	pushl	%ebp
+	xorl	%edx, %edx
+	rrmovl	%esp, %ebp
+	xorl	%eax, %eax
+	mrmovl	16(%ebp), %ecx
+	pushl	%edi
+	mrmovl	8(%ebp), %edi
+	pushl	%esi
+	mrmovl	12(%ebp), %esi
+	pushl	%ebx
+	andl	%ecx, %ecx
+	jle	L18
+
+L21:
+	addl	%edx, %edi
+	mrmovl	(%edi), %ebx
+	addl	%edx, %esi
+	rmmovl	%ebx, (%esi)
+	xorl	%ebx, %eax
+	irmovl	$4, %edx
+	irmovl	$1, %ebp
+	subl	%ebp, %ecx
+	jne	L21
+L18:
+	popl	%ebx
+	popl	%esi
+	popl	%edi
+	popl	%ebp
+	ret
+	
+.pos 0x200
+Stack:
+
+

@@ -1,0 +1,60 @@
+                      | # Jae Lee
+                      | # jhl48
+                      | 
+  0x000:              | .pos0
+  0x000: 308400020000 | 	irmovl Stack,%esp
+  0x006: 2045         | 	rrmovl %esp,%ebp
+  0x008: 308218000000 | 	irmovl src,%edx
+  0x00e: a028         | 	pushl %edx
+  0x010: 8030000000   | 	call copy_block
+  0x015: 10           | 	halt
+                      | 	
+                      | 
+  0x018:              | .align 4
+                      | # Source block
+  0x018:              | src:
+  0x018: 0a000000     | 	.long 0x00a
+  0x01c: b0000000     | 	.long 0x0b0
+  0x020: 000c0000     | 	.long 0xc00
+                      | 
+                      | # Destination block
+  0x024:              | dest:
+  0x024: 11010000     | 	.long 0x111
+  0x028: 22020000     | 	.long 0x222
+  0x02c: 33030000     | 	.long 0x333
+                      | 	
+  0x030:              | copy_block:
+  0x030: a058         | 	pushl	%ebp
+  0x032: 6322         | 	xorl	%edx, %edx
+  0x034: 2045         | 	rrmovl	%esp, %ebp
+  0x036: 6300         | 	xorl	%eax, %eax
+  0x038: 501510000000 | 	mrmovl	16(%ebp), %ecx
+  0x03e: a078         | 	pushl	%edi
+  0x040: 507508000000 | 	mrmovl	8(%ebp), %edi
+  0x046: a068         | 	pushl	%esi
+  0x048: 50650c000000 | 	mrmovl	12(%ebp), %esi
+  0x04e: a038         | 	pushl	%ebx
+  0x050: 6211         | 	andl	%ecx, %ecx
+  0x052: 717c000000   | 	jle	L18
+                      | 
+  0x057:              | L21:
+  0x057: 6027         | 	addl	%edx, %edi
+  0x059: 503700000000 | 	mrmovl	(%edi), %ebx
+  0x05f: 6026         | 	addl	%edx, %esi
+  0x061: 403600000000 | 	rmmovl	%ebx, (%esi)
+  0x067: 6330         | 	xorl	%ebx, %eax
+  0x069: 308204000000 | 	irmovl	$4, %edx
+  0x06f: 308501000000 | 	irmovl	$1, %ebp
+  0x075: 6151         | 	subl	%ebp, %ecx
+  0x077: 7457000000   | 	jne	L21
+  0x07c:              | L18:
+  0x07c: b038         | 	popl	%ebx
+  0x07e: b068         | 	popl	%esi
+  0x080: b078         | 	popl	%edi
+  0x082: b058         | 	popl	%ebp
+  0x084: 90           | 	ret
+                      | 	
+  0x200:              | .pos 0x200
+  0x200:              | Stack:
+                      | 
+                      | 

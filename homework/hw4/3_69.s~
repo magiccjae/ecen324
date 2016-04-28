@@ -1,0 +1,32 @@
+	.file	"3_69.c"
+	.text
+.globl trace
+	.type	trace, @function
+trace:
+.LFB0:
+	.cfi_startproc
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	.cfi_offset 3, -16
+	movq	%rdi, %rbx
+	testq	%rdi, %rdi
+	je	.L2
+	movq	16(%rdi), %rdi
+	call	trace
+	jmp	.L3
+.L2:
+	movl	$0, %eax
+	popq	%rbx
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L3:
+	.cfi_restore_state
+	movq	16(%rbx), %rdi
+	call	trace
+	jmp	.L3
+	.cfi_endproc
+.LFE0:
+	.size	trace, .-trace
+	.ident	"GCC: (GNU) 4.4.7 20120313 (Red Hat 4.4.7-3)"
+	.section	.note.GNU-stack,"",@progbits

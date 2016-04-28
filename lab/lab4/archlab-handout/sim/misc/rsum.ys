@@ -1,0 +1,45 @@
+# Jae Lee
+# jhl48
+
+.pos0
+	irmovl Stack,%esp
+	rrmovl %esp,%ebp
+	irmovl ele1,%edx
+	pushl %edx
+	call rsum_list
+	halt
+	
+# Sample linked list
+.align 4
+ele1:
+	.long 0x00a
+	.long ele2
+ele2:
+	.long 0x0b0
+	.long ele3
+ele3:
+	.long 0xc00
+	.long 0
+	
+rsum_list:
+	pushl	%ebp
+	xorl	%eax, %eax
+	rrmovl	%esp, %ebp
+	mrmovl	8(%ebp), %edx
+	andl	%edx, %edx
+	je	L11
+
+L14:
+	mrmovl	(%edx), %ecx
+	mrmovl	4(%edx), %edx
+	addl	%ecx, %eax
+	andl	%edx, %edx
+	jne	L14
+L11:
+	popl	%ebp
+	ret
+
+.pos 0x200
+Stack:
+
+

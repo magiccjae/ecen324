@@ -1,0 +1,107 @@
+# Execution begins at address 0
+        .pos 0
+init:   irmovl Stack,%esp     # Set up stack pointer
+        irmovl Stack,%ebp     # Set up base pointer
+        jmp Main              # Execute main program
+
+# Array of 7 elements
+        .align 4
+array:  .long 0xdddd          # These values should get sorted
+        .long 0xeeee
+        .long 0xbbbb
+        .long 0xaaaa
+        .long 0xffff
+        .long 0xcccc
+        .long 0x0101          # This value should not change
+
+Main:   irmovl $6,%eax
+        pushl %eax            # push array size 
+        irmovl array,%edx
+        pushl %edx            # push array address
+        call Bubble           # Bubble(array,6)
+        halt
+
+# void Bubble(int *data, int count)
+Bubble:
+    # your handtranslated code goes here
+	bubble_p:	// done
+		pushl	%ebp
+		rrmovl	%esp, %ebp
+		irmovl	$16, %esi
+		subl	%esi, %esp
+		mrmovl	12(%ebp), %eax
+		irmovl	$1, %esi
+		subl	%esi, %eax
+		rmmovl	%eax, -8(%ebp)
+		jmp	.L9
+	.L13:	// done
+		irmovl	$0, %esi
+		rmmovl	%esi, -12(%ebp)
+		jmp	.L10
+	.L12:	// done
+		mrmovl	-12(%ebp), %eax	
+		irmovl 	$1, %esi
+		addl	%esi, %eax
+		addl 	%eax, %eax
+		addl	%eax, %eax		
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %eax
+		mrmovl	(%eax), %edx
+		mrmovl	-12(%ebp), %eax
+		addl 	%eax, %eax
+		addl	%eax, %eax
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %eax
+		mrmovl	(%eax), %eax
+		subl	%eax, %edx
+		jge	.L11
+		mrmovl	-12(%ebp), %eax
+		irmovl 	$1, %esi
+		addl	%esi, %eax
+		addl 	%eax, %eax
+		addl	%eax, %eax		
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %eax
+		mrmovl	(%eax), %eax
+		rmmovl	%eax, -4(%ebp)
+		mrmovl	-12(%ebp), %eax
+		irmovl 	$1, %esi
+		addl	%esi, %eax
+		addl 	%eax, %eax
+		addl	%eax, %eax		
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %eax
+		mrmovl	-12(%ebp), %edx
+		addl	%edx, %edx
+		addl	%edx, %edx
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %edx
+		mrmovl	(%edx), %edx
+		rmmovl	%edx, (%eax)
+		mrmovl	-12(%ebp), %eax
+		addl 	%eax, %eax
+		addl	%eax, %eax				
+		mrmovl	8(%ebp), %edi
+		addl	%edi, %eax
+		mrmovl	-4(%ebp), %edx
+		rmmovl	%edx, (%eax)
+	.L11:	// done
+		irmovl	$1, %esi
+		mrmovl	-12(%ebp), %edi
+		addl	%esi, %edi
+		rmmovl	%edi, -12(%ebp)
+	.L10:	// done
+		mrmovl	-12(%ebp), %eax
+		mrmovl	-8(%ebp), %edi
+		subl	%edi, %eax
+		jl	.L12
+		subl	$1, -8(%ebp)
+	.L9:	// done
+		irmovl	$0, %esi
+		mrmovl	-8(%ebp), %edi
+		subl	%esi, %edi
+		jg	.L13
+		leave
+		ret
+	
+Stack:                        # Stack goes here, grows down

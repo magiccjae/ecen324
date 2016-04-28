@@ -1,0 +1,224 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/* change next 3 lines to change cache */
+#define SETASSOC     2  // 1 is direct mapped, etc.
+#define CACHESIZE  128  // size in bytes
+#define BLOCKSIZE    2  // size in bytes
+
+/* don't change these */
+#define HIT     1
+#define MISS    0
+#define VALID   1
+#define INVALID 0
+
+/* the basic data structure for each line in the cache. note that it
+ * does not have a field for the actual contents of the block --
+ * we're not tracking actual memory values, just determining hits and
+ * misses. In this code, the reference field stores a value
+ * corresponding to the last access that referenced this line, where
+ * lower values are older than higher values.
+ */
+struct cache_line 
+{
+    unsigned int tag;  // tag bits
+    int valid;         // valid bit (int is 0 or 1)
+    int reference;     // replacement info for set-associative caches
+} ;
+
+/* the data structure for the entire cache array. the size is
+ * determined completely by SETASSOC, CACHESIZE, and BLOCKSIZE defined
+ * above 
+ */
+struct cache_line cache[CACHESIZE/(BLOCKSIZE*SETASSOC)][SETASSOC];
+
+/* the ref array is the sequence of addresses that we are simulating
+ * for the modeled cache. Can be as long as desired. Most convienient
+ * to list them in hex.
+ */
+int ref[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x40, 0x42, 0x41 } ;
+
+/* this function returns log2 of the past argument, assumed to be a
+ * power of 2 */
+int mylog2(int x)
+{
+    int res;
+    if (x == 0)
+    {
+	fprintf(stderr, "mylog2() called with zero value \n");
+	exit(-1);
+    }
+    res = -1;
+    while (x > 0)
+    {
+	x = x >> 1;
+	res++;
+    }
+    return res;
+}
+
+/* this function returns a bit mask x bits wide, beginning with the
+ * least significant bit 
+ */
+int makemask(int x)
+{
+    int res;
+    if (x == 0)
+    {
+	fprintf(stderr, "makemask() called with zero value \n");
+	exit(-1);
+    }
+    res = 0x00;
+    while (x > 0)
+    {
+	x--;
+	res = (res << 1) | 0x01;
+    }
+    return res;
+}
+
+/* this function dumps all valid entries in the cache in a fairly
+ * concise manner (to avoid screen clutter). Entries in the same cache
+ * set are combined in each output line. The output gives the set
+ * number, then the tag and reference values for each valid entry in
+ * that set. If output on each access, this is enough to verify
+ * correct cache operation, including replacement.
+ */
+void dumpvalidcache(void)
+{
+    int i,j,sethit;
+    printf("   Valid cache contents:\n");
+    for (i = 0; i < CACHESIZE/(BLOCKSIZE*SETASSOC); i++)
+    {
+	sethit = 0;
+	for (j = 0; j < SETASSOC; j++)
+	    if (cache[i][j].valid == VALID)
+	    {
+		if (sethit == 0)
+		{
+		    printf("      set 0x%.2x ", i);
+		    sethit = 1;
+		}
+		printf("[t:0x%.2x][r:%d]   ", cache[i][j].tag,
+		       cache[i][j].reference); 
+	    }
+	if (sethit)
+	    printf("\n");
+    }
+}
+
+int main()
+{
+    int i,j,len,refnum,addr,tag,index,indexmask,bshift,ishift,outcome;
+    int hitcount = 0;
+    int misscount = 0;
+    int numsets = CACHESIZE/(BLOCKSIZE*SETASSOC);
+
+    /* first, output information about the cache configuration we're
+       simulating: a sanity check */
+    printf("Simulating ");
+    if (SETASSOC == 1)
+	printf("Direct-mapped ");
+    else 
+	printf("%d-way set-associative ", SETASSOC);
+    printf("cache\n  Size: %d bytes, #Sets: %d, Blocks: %d bytes\n", 
+	   CACHESIZE, numsets, BLOCKSIZE);
+    
+    /* clear cache: initialize all cache entries to invalid */
+    for (i = 0; i < numsets; i++)
+	for (j = 0; j < SETASSOC; j++)
+	    cache[i][j].valid = INVALID;
+
+    /* determine values to process each address for this cache */
+    bshift = mylog2(BLOCKSIZE);   // width in bits of block offset field
+    ishift = mylog2(numsets);     // width in bits of set index field
+    indexmask = makemask(ishift); // mask to get shifted set index field
+    printf("  [variable values: bshift = %d, ishift = %d, indexmask = 0x%x]\n", bshift, ishift, indexmask);
+
+    /* now process reference sequence: assume machine is
+     * byte-addressable and that each request is for one byte. Use the
+     * variables bshift, ishift, and indexmask to interpret the bits
+     * in each address  */
+    len = (int) sizeof(ref) / sizeof(int);  // determine # references
+    for (refnum = 0; refnum < len; refnum++)
+    {
+	/* get the next address in sequence */
+	addr = ref[refnum];
+
+	/* strip out index and tag fields: compute index and tag
+	 * values using addr, bshift, ishift, and indexmask */
+
+        // Your code goes here
+	// index = ?
+	// tag = ?
+	index = (addr>>bshift) & indexmask;
+	tag = addr>>(bshift+ishift);
+
+	/* now check set for matching tag. If no matching entry, set
+	 * outcome to MISS. Otherwise, set outcome to HIT and update
+	 * the reference field with current value of refnum. */
+
+	// Your code goes here
+	// remember to check all valid entries in set!
+	outcome = MISS;
+	for(i = 0; i < SETASSOC; i++)
+	{
+		if(cache[index][i].valid == VALID && cache[index][i].tag == tag)
+		{
+			outcome = HIT;
+			cache[index][i].reference = refnum;
+		}
+	}
+
+	
+	/* if miss, insert entry in cache */
+	if (outcome == MISS)
+	{
+	    /* pick replacement slot: first INVALID or oldest
+	       reference value */
+	    int min = -1;
+	    for (i = 0; i < SETASSOC; i++)
+	    {
+			if (cache[index][i].valid == INVALID)
+			{
+				min = i;
+				break;
+			}
+	    }
+	    if (min == -1) 
+	    {   // no INVALID slot found
+			min = 0;
+			for (i = 1; i < SETASSOC; i++)   // compare with remaining slots
+			{
+				if (cache[index][i].reference < cache[index][min].reference)
+				min = i;
+			}
+	    }
+
+            /* put block in slot that was identified */
+
+	    // Your code goes here
+	    cache[index][min].tag = tag;
+	    cache[index][min].valid = VALID;
+	 	cache[index][min].reference = refnum;
+	}
+
+	printf("Reference: address = 0x%.3x, ", addr, addr);
+	if (outcome == HIT)
+	{
+	    printf("hit\n");
+	    hitcount++;
+	}
+	else
+	{
+	    printf("miss\n");
+	    misscount++;
+	}
+	
+	/* for debugging: output valid cache contents */
+	dumpvalidcache();
+
+    }
+    printf("Summary: %d hits and %d misses\n", hitcount, misscount);
+}
+

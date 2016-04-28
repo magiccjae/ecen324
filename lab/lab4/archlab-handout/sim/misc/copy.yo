@@ -1,0 +1,64 @@
+                      | # Jae Lee
+                      | # jhl48
+                      | 
+  0x000:              | .pos0
+  0x000: 308400020000 | 	irmovl Stack,%esp
+  0x006: 2045         | 	rrmovl %esp,%ebp
+  0x008: 308203000000 | 	irmovl $3, %edx
+  0x00e: a028         | 	pushl %edx
+  0x010: 308234000000 | 	irmovl dest, %edx
+  0x016: a028         | 	pushl %edx
+  0x018: 308228000000 | 	irmovl src,%edx
+  0x01e: a028         | 	pushl %edx
+  0x020: 8040000000   | 	call copy_block
+  0x025: 10           | 	halt
+                      | 	
+                      | 
+  0x028:              | .align 4
+                      | # Source block
+  0x028:              | src:
+  0x028: 0a000000     | 	.long 0x00a
+  0x02c: b0000000     | 	.long 0x0b0
+  0x030: 000c0000     | 	.long 0xc00
+                      | 
+                      | # Destination block
+  0x034:              | dest:
+  0x034: 11010000     | 	.long 0x111
+  0x038: 22020000     | 	.long 0x222
+  0x03c: 33030000     | 	.long 0x333
+                      | 	
+  0x040:              | copy_block:
+  0x040: a058         | 	pushl	%ebp
+  0x042: 6322         | 	xorl	%edx, %edx
+  0x044: 2045         | 	rrmovl	%esp, %ebp
+  0x046: 6300         | 	xorl	%eax, %eax
+  0x048: 501510000000 | 	mrmovl	16(%ebp), %ecx
+  0x04e: a078         | 	pushl	%edi
+  0x050: 507508000000 | 	mrmovl	8(%ebp), %edi
+  0x056: a068         | 	pushl	%esi
+  0x058: 50650c000000 | 	mrmovl	12(%ebp), %esi
+  0x05e: a038         | 	pushl	%ebx
+  0x060: 6211         | 	andl	%ecx, %ecx
+  0x062: 718c000000   | 	jle	L18
+                      | 
+  0x067:              | L21:
+  0x067: 6027         | 	addl	%edx, %edi
+  0x069: 503700000000 | 	mrmovl	(%edi), %ebx
+  0x06f: 6026         | 	addl	%edx, %esi
+  0x071: 403600000000 | 	rmmovl	%ebx, (%esi)
+  0x077: 6330         | 	xorl	%ebx, %eax
+  0x079: 308204000000 | 	irmovl	$4, %edx
+  0x07f: 308501000000 | 	irmovl	$1, %ebp
+  0x085: 6151         | 	subl	%ebp, %ecx
+  0x087: 7467000000   | 	jne	L21
+  0x08c:              | L18:
+  0x08c: b038         | 	popl	%ebx
+  0x08e: b068         | 	popl	%esi
+  0x090: b078         | 	popl	%edi
+  0x092: b058         | 	popl	%ebp
+  0x094: 90           | 	ret
+                      | 	
+  0x200:              | .pos 0x200
+  0x200:              | Stack:
+                      | 
+                      | 

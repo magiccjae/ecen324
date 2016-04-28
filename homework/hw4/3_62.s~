@@ -1,0 +1,42 @@
+	.file	"3_62.c"
+	.text
+	.p2align 4,,15
+.globl transpose
+	.type	transpose, @function
+transpose:
+	pushl	%ebp
+	movl	%esp, %ebp
+	movl	8(%ebp), %ecx
+	pushl	%edi
+	pushl	%esi
+	pushl	%ebx
+	movl	$1, %ebx
+	addl	$16, %ecx
+	cmpl	$4, %ebx
+	je	.L5
+.L8:
+	movl	8(%ebp), %eax
+	leal	(%eax,%ebx,4), %edx
+	addl	$1, %ebx
+	movl	$1, %eax
+.L3:
+	movl	(%edx), %edi
+	movl	-4(%ecx,%eax,4), %esi
+	movl	%edi, -4(%ecx,%eax,4)
+	addl	$1, %eax
+	movl	%esi, (%edx)
+	addl	$16, %edx
+	cmpl	%ebx, %eax
+	jne	.L3
+	addl	$16, %ecx
+	cmpl	$4, %ebx
+	jne	.L8
+.L5:
+	popl	%ebx
+	popl	%esi
+	popl	%edi
+	popl	%ebp
+	ret
+	.size	transpose, .-transpose
+	.ident	"GCC: (GNU) 4.4.7 20120313 (Red Hat 4.4.7-3)"
+	.section	.note.GNU-stack,"",@progbits

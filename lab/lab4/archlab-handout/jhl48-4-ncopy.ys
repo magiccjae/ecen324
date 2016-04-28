@@ -1,0 +1,53 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len ints to dst.
+# Return the number of positive ints (>0) contained in src.
+#
+# Include your name and ID here.
+#
+# Describe how and why you modified the baseline code.
+#
+##################################################################
+	# Function prologue. Do not modify.
+ncopy:	pushl %ebp		# Save old frame pointer
+	rrmovl %esp,%ebp	# Set up new frame pointer
+	pushl %esi		# Save callee-save regs
+	pushl %ebx
+	mrmovl 8(%ebp),%ebx	# src
+	mrmovl 12(%ebp),%ecx	# dst
+	mrmovl 16(%ebp),%edx	# len
+
+	# Loop header
+rrmovl %edx, %esi
+        iaddl $1, %edx
+
+Loop:   iaddl $-1, %edx
+       		jle Done
+Loop1:  mrmovl (%ebx), %eax
+        rmmovl %eax, (%ecx)
+Npos:   iaddl $4, %ebx          # src++
+        iaddl $4, %ecx          # dst++
+        andl %eax, %eax
+        jle decEsi
+        iaddl $-1, %edx
+        jle Done
+
+        mrmovl (%ebx), %eax
+        rmmovl %eax, (%ecx)
+        iaddl $4, %ebx
+        iaddl $4, %ecx
+        andl %eax, %eax
+        jle decEsi
+        jmp Loop
+
+decEsi: iaddl $-1, %esi,
+        	jg Loop
+
+	# Function epilogue. Do not modify.
+Done:	rrmovl %esi, %eax
+	popl %ebx
+	popl %esi
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+#/* $end ncopy-ys */
